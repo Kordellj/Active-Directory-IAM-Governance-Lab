@@ -11,6 +11,10 @@ This personal lab illustrates selected control concepts. The mappings describe t
 | CIS Controls v8.1 | 5.1 Inventory of Accounts | Produced a point-in-time two-account directory inventory. A full inventory and scheduled validation were outside scope. |
 | CIS Controls v8.1 | 6.1 Granting, 6.2 Revoking, 6.8 RBAC | Assigned departmental roles, revoked inappropriate and terminated-user access, and reviewed the resulting entitlements. Formal scheduling and sign-off were outside scope. |
 
+## Verification evidence
+
+The final Windows Effective Access calculations support the access enforcement, least privilege, and revocation mappings above. The Finance folder no longer granted list/read, create/write, or Delete permissions to [James after remediation](../screenshots/18-james-finance-effective-access-after.png) or [Sarah after offboarding](../screenshots/20-sarah-finance-effective-access-after-offboarding.png). These results apply to the folder’s calculated NTFS permissions. Password-change and logon-type restrictions blocked live file access testing under employee identities.
+
 ## Sources
 
 - [NIST SP 800-53 Rev. 5](https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final)

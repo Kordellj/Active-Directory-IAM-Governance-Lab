@@ -40,9 +40,12 @@ The Finance resource follows **AGDLP**: accounts receive Finance role membership
 
 I deliberately added James to `GG_FINANCE_USERS` to simulate privilege creep. I inspected his memberships in ADUC and PowerShell, enumerated `DL_FINANCE_RW` recursively, examined the Finance ACL with `Get-Acl`, and used Windows Effective Access to evaluate the result. The excessive entitlement exposed Finance data to potential unauthorized viewing, modification, and deletion.
 
-![James has read and write permissions in the Finance Effective Access calculation](screenshots/15-james-finance-effective-access-before.png)
+### James Carter’s Finance permissions before and after remediation
 
-*Windows calculated that James could list/read and create/write on the Finance folder during the simulated exception. Full Control remained unavailable.*
+| Before removal from Finance | After removal from Finance |
+| --- | --- |
+| ![James’s Finance Effective Access before remediation](screenshots/15-james-finance-effective-access-before.png) | ![James’s Finance Effective Access after remediation](screenshots/18-james-finance-effective-access-after.png) |
+| List folder / read data, create files / write data, and Delete were allowed. | Windows Effective Access shows those permissions were no longer granted on the Finance folder. |
 
 I removed James from the Finance global group. ADUC confirmed that he retained Sales membership and a [repeat recursive check](screenshots/17-finance-membership-after-remediation.png) listed only Sarah at that stage. The [investigation report](reports/Security-Investigation-Report.md) details the investigation and validation.
 
@@ -52,12 +55,14 @@ For a simulated HR-authorized termination, I disabled Sarah’s account, removed
 
 ![Sarah Mitchell in the Disabled Accounts OU](screenshots/19-disabled-accounts-ou.png)
 
+![Sarah’s Finance Effective Access after offboarding](screenshots/20-sarah-finance-effective-access-after-offboarding.png)
+
+*Windows Effective Access shows that Sarah no longer had list/read, create/write, or Delete permissions on the Finance folder after offboarding.*
+
 | Identity | During the simulated exception | Final decision and retained evidence |
 | --- | --- | --- |
-| James Carter, Sales | Sales and Finance memberships. Finance read/write calculated by Effective Access. | Retain Sales only. Post-remediation ADUC, recursive Finance membership, and the final CSV support the decision. |
-| Sarah Mitchell, Finance | Enabled Finance employee with a Finance role assignment. | Disable and retain the account. Remove the Finance role. ADUC shows the Disabled Accounts OU, and PowerShell shows `False` and no direct memberships in `MemberOf`. |
-
-The lab brief records that final Windows Effective Access checks showed Finance access was revoked for both accounts. The supplied screenshots directly show James’s **before** calculation and the **after** directory membership and account states. Final Effective Access screenshots were unavailable in the supplied evidence.
+| James Carter, Sales | Sales and Finance memberships. Finance read/write calculated by Effective Access. | Retain Sales only. ADUC and PowerShell confirm the membership change. Windows Effective Access confirms the loss of Finance read/write and Delete permissions. |
+| Sarah Mitchell, Finance | Enabled Finance employee with a Finance role assignment. | Disable and retain the account. Remove the Finance role. ADUC shows the Disabled Accounts OU, and PowerShell shows `False` and no direct memberships in `MemberOf`. Windows Effective Access confirms the loss of Finance read/write and Delete permissions. |
 
 ## PowerShell automation and audit evidence
 
@@ -73,6 +78,6 @@ I ran an access review script to query accounts beneath the Corp OU, export name
 - **Lessons learned** — Membership, resource ACLs, and calculated permissions answer different questions. Review all three, preserve legitimate access during remediation, and document the point at which each check was captured.
 - **Validation limits** — Live file-access tests under the employee identities were blocked by password-change and logon-type restrictions. Initial Effective Access readings lagged the expected membership state and the cause was unconfirmed. The distinguished-name query did not verify Sarah’s OU, so ADUC provided that evidence.
 - **Reporting limits** — The CSV is a point-in-time direct membership inventory. `MemberOf` omits the primary group and does not expand nested group paths or calculate effective NTFS rights. The two simulated identities and one protected resource define the lab scope.
-- **Future improvements** — Add a domain-joined test client, retain the final Effective Access captures, report nested entitlement paths alongside direct memberships, and include resource-owner approval and timestamped evidence for recurring reviews.
+- **Future improvements** — Add a domain-joined test client, report nested entitlement paths alongside direct memberships, and include resource-owner approval and timestamped evidence for recurring reviews.
 
 [Employee offboarding report](reports/Employee-Offboarding-Report.md) · [Control mapping](reports/Control-Mapping.md)
